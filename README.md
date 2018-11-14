@@ -1,6 +1,6 @@
 # Go Tunneler
 
-> A layer 4 reverse proxy, which forwards packets through an HTTP tunnel.
+> A layer 4 reverse proxy, which forwards packets through an HTTP tunnel
 
 **This is an example implementation and not production ready.**
 
