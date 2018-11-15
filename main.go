@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"io"
 	"log"
 	"net"
@@ -17,7 +19,7 @@ func copyAndClose(dst io.WriteCloser, src io.Reader, logTag string) {
 	dst.Close()
 }
 
-func handleConnection(c net.Conn) {
+func handleConnection(c net.Conn, proxyAddress string) {
 	tag := c.RemoteAddr().String()
 	log.Printf("[%s] New connection\n", tag)
 
@@ -30,7 +32,7 @@ func handleConnection(c net.Conn) {
 
 	log.Printf("[%s] Found server name %s\n", tag, serverName)
 
-	proxy, err := util.NewHTTPTunnel(serverName)
+	proxy, err := util.NewHTTPTunnel(proxyAddress, serverName)
 	if err != nil {
 		log.Printf("[%s] Error connecting to proxy: %v\n", tag, err)
 		c.Close()
@@ -52,7 +54,20 @@ func handleConnection(c net.Conn) {
 }
 
 func main() {
-	l, err := net.Listen("tcp", ":8443")
+	var proxyAddress string
+	var port int
+	var help bool
+	flag.StringVar(&proxyAddress, "proxy", "127.0.0.1:3128", "Proxy address")
+	flag.IntVar(&port, "port", 443, "Port the Go Tunneler should listen on")
+	flag.BoolVar(&help, "help", false, "Show help")
+	flag.Parse()
+
+	if help {
+		flag.Usage()
+		return
+	}
+
+	l, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
 		log.Printf("Error listening on 8443: %v\n", err)
 		return
@@ -60,7 +75,7 @@ func main() {
 
 	defer l.Close()
 
-	log.Printf("Listening on 8443, waiting for connections...\n")
+	log.Printf("Listening on %d, waiting for connections...\n", port)
 	for {
 		c, err := l.Accept()
 		if err != nil {
@@ -68,6 +83,6 @@ func main() {
 			return
 		}
 
-		go handleConnection(c)
+		go handleConnection(c, proxyAddress)
 	}
 }

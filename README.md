@@ -51,7 +51,7 @@ Another option is a layer 4 proxy. Change the DNS resolution of example.com to r
 3. Start the to Go Tunneler:
 
     ```sh
-    go run main.to
+    go run main.to -port 8443 -proxy 127.0.0.1:8888
     ```
 
 4. Open your browser and go to https://example.com:8443

@@ -9,8 +9,8 @@ import (
 
 // NewHTTPTunnel opens a connection to 127.0.0.1:8888 and initiates an HTTP
 // tunnel by sending a CONNECT message.
-func NewHTTPTunnel(serverName string) (net.Conn, error) {
-	proxy, err := net.Dial("tcp", "127.0.0.1:8888")
+func NewHTTPTunnel(proxyAddress, serverName string) (net.Conn, error) {
+	proxy, err := net.Dial("tcp", proxyAddress)
 	if err != nil {
 		return nil, fmt.Errorf("error connecting to proxy: %v", err)
 	}
